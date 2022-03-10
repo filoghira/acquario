@@ -1,0 +1,10 @@
+tr,td,table{
+    border: 1px solid transparent;
+    color:black;
+    margin: auto;
+}
+body{
+    margin: inherit;
+    background-color: #559a9c;
+    text-align: center;
+}
