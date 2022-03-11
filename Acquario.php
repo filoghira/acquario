@@ -15,11 +15,21 @@ function init($height, $width): array
 
     $matrix = array_fill(0, $height, array_fill(0, $width, 0));
 
-    for ($i=0; $i <= $nFish_1; $i++)
-        $matrix[rand(0,$height)][rand(0,$width)] = 1;
+    for ($i=0; $i <= $nFish_1; $i++) {
+        try {
+            $matrix[random_int(0, $height)][random_int(0, $width)] = 1;
+        } catch (Exception $e) {
+            $i--;
+        }
+    }
 
-    for ($i=0; $i <= $nFih_2; $i++)
-        $matrix[rand(0,$height)][rand(0,$width)] = 2;
+    for ($i=0; $i <= $nFih_2; $i++) {
+        try {
+            $matrix[random_int(0, $height)][random_int(0, $width)] = 2;
+        } catch (Exception $e) {
+            $i--;
+        }
+    }
 
     return $matrix;
 }
@@ -29,58 +39,64 @@ function move_fishes(){
     $h = $_SESSION['h'];
     $w = $_SESSION['w'];
 
-    for ($i=0; $i < $h; $i++)
-        for ($j=0; $j < $w; $j++){
+    for ($i=0; $i < $h; $i++) {
+        for ($j = 0; $j < $w; $j++) {
             // Move fishes to a random direction
-            $dir = rand(0, 3);
-            if(valid_direction($i, $j, $dir, $matrix)) {
+            try {
+                $dir = random_int(0, 3);
 
-                switch ($dir) {
-                    // Up
-                    case 0:
-                        $temp = $matrix[$i][$j];
-                        $matrix[$i - 1][$j] = $temp;
-                        break;
-                    // Right
-                    case 1:
-                        $temp = $matrix[$i][$j];
-                        $matrix[$i][$j + 1] = $temp;
-                        break;
-                    // Down
-                    case 2:
-                        $temp = $matrix[$i][$j];
-                        $matrix[$i + 1][$j] = $temp;
-                        break;
-                    // Left
-                    case 3:
-                        $temp = $matrix[$i][$j];
-                        $matrix[$i][$j - 1] = $temp;
-                        break;
+                if (valid_direction($i, $j, $dir, $matrix)) {
+
+                    switch ($dir) {
+                        // Up
+                        case 0:
+                            $temp = $matrix[$i][$j];
+                            $matrix[$i - 1][$j] = $temp;
+                            break;
+                        // Right
+                        case 1:
+                            $temp = $matrix[$i][$j];
+                            $matrix[$i][$j + 1] = $temp;
+                            break;
+                        // Down
+                        case 2:
+                            $temp = $matrix[$i][$j];
+                            $matrix[$i + 1][$j] = $temp;
+                            break;
+                        // Left
+                        case 3:
+                            $temp = $matrix[$i][$j];
+                            $matrix[$i][$j - 1] = $temp;
+                            break;
+                    }
+                    $matrix[$i][$j] = 0;
                 }
-                $matrix[$i][$j] = 0;
+            } catch (Exception $e) {
+                $j--;
             }
-
         }
+    }
 
     $_SESSION['acquario'] = $matrix;
 }
 
 function valid_direction($i, $j, $dir, $matrix): bool
 {
-    if ($matrix[$i][$j] == 0)
+    if ($matrix[$i][$j] === 0) {
         return false;
+    }
     $h = $_SESSION['h'];
     $w = $_SESSION['w'];
 
     return match ($dir) {
         // Up
-        0 => ($i > 0 && $matrix[$i - 1][$j] == 0),
+        0 => ($i > 0 && $matrix[$i - 1][$j] === 0),
         // Right
-        1 => ($j < ($w - 1) && $matrix[$i][$j + 1] == 0),
+        1 => ($j < ($w - 1) && $matrix[$i][$j + 1] === 0),
         // Down
-        2 => ($i < ($h - 1)) && $matrix[$i + 1][$j] == 0,
+        2 => ($i < ($h - 1)) && $matrix[$i + 1][$j] === 0,
         // Left
-        3 => ($j > 0 && $matrix[$i][$j - 1] == 0),
+        3 => ($j > 0 && $matrix[$i][$j - 1] === 0),
         default => false,
     };
 }
@@ -89,8 +105,9 @@ function print_matrix($matrix){
     echo "<table>";
     for ($i=0; $i < $_SESSION['h']; $i++) {
         echo "<tr>";
-        for ($j=0; $j < $_SESSION['w']; $j++)
-            echo "<td><img src='images/".$matrix[$i][$j].".png' height='30' width='30' alt='lol'></td>";
+        for ($j=0; $j < $_SESSION['w']; $j++) {
+            echo "<td><img src='images/" . $matrix[$i][$j] . ".png' height='50%' width='50%' alt='lol'></td>";
+        }
         echo "</tr>";
     }
     echo "</table>";
@@ -98,8 +115,9 @@ function print_matrix($matrix){
 
 header("Refresh: 1; URL=".$_SERVER['REQUEST_URI']);
 
-if (!isset($_SESSION['counter']))
-    $_SESSION['acquario'] = init(10,10);
+if (!isset($_SESSION['counter'])) {
+    $_SESSION['acquario'] = init(10, 10);
+}
 else {
     move_fishes();
     $_SESSION['counter']++;
@@ -113,8 +131,6 @@ else {
     <title>Acquario</title>
 </head>
 <body>
-<h1>Acquario</h1>
-
 <?php
 print_matrix( $_SESSION['acquario']);
 ?>
